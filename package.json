@@ -27,7 +27,9 @@
     "precss": "^1.4.0",
     "run-sequence": "^1.2.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "gulp-minify": "^1.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hexboy/woocommerce-product-magnifier.git"
@@ -35,6 +37,5 @@
   "bugs": {
     "url": "https://github.com/hexboy/woocommerce-product-magnifier/issues"
   },
-  "homepage": "https://github.com/hexboy/woocommerce-product-magnifier#readme",
-  "description": ""
+  "homepage": "https://github.com/hexboy/woocommerce-product-magnifier#readme"
 }
