@@ -1,16 +1,14 @@
 <?php
+
 /**
- * @package woocommerce-product-magnifier
- * @version 1.0
- *
-/*
-Plugin Name: woocommerce product magnifier
-Plugin URI: https://github.com/hexboy/woocommerce-product-magnifier
-Description: simple wordpress plugin, zoom image of product
-Author: Hexboy
-Version: 1.0.
-Author URI: https://github.com/hexboy/
+ *  Plugin Name: woocommerce product magnifier
+ *  Plugin URI: https://github.com/hexboy/woocommerce-product-magnifier
+ *  Description: simple wordpress plugin, zoom image of product
+ *  Author: Hexboy
+ *  Version: 1.0.
+ *  Author URI: https://github.com/hexboy/
  */
+
 function iplug_zoom_product_image() {
 	global $product, $post;
 	if ( !function_exists( 'is_woocommerce' ) ) return;
@@ -23,10 +21,10 @@ function iplug_zoom_product_image() {
 
 	// get plugin options
 
-	$iscircle = get_option('iplug_iscircle',1);
+	$iscircle    = get_option('iplug_iscircle',1);
 	$transparent = get_option('iplug_transparent',0);
-	$zoom_level = get_option('iplug_zoom_level',1.2);
-	$zoom_size = get_option('iplug_zoom_size',300);
+	$zoom_level  = get_option('iplug_zoom_level',1.2);
+	$zoom_size   = get_option('iplug_zoom_size',300);
 	?>
 	<script type='text/javascript'>
 		var ipzo = {'transparent': <?=$transparent?>, 'iscircle': <?=$iscircle?>, 'zoomLevel': <?=$zoom_level?>, 'zoomSize': <?=$zoom_size?>,'bg': "<?=plugins_url('/images/bg.jpg', __FILE__)?>"};
@@ -69,30 +67,24 @@ function iplug_zoom_image_menu_page() {
 
 
 function iplug_display_zoom_level() {
-	?>
-    	<input type="text"  type="number" name="iplug_zoom_level" id="iplug_zoom_level" value="<?php echo get_option('iplug_zoom_level',1); ?>" />
-    <?php
+    echo '<input type="text"  type="number" name="iplug_zoom_level" id="iplug_zoom_level" value="'. get_option('iplug_zoom_level',1). '"/>';
 }
+
 function iplug_display_zoom_size() {
-	?>
-    	<input type="text" name="iplug_zoom_size" id="iplug_zoom_size" value="<?php echo get_option('iplug_zoom_size',300); ?>" />
-    <?php
+    echo '<input type="text" name="iplug_zoom_size" id="iplug_zoom_size" value="' . get_option('iplug_zoom_size',300) . '" />';
 }
 
 function iplug_display_transparent() {
-	?>
-    	<input type="checkbox" name="iplug_transparent" value="1" <?php checked(1, get_option('iplug_transparent',1), true);?> />
-    <?php
+	echo '<input type="checkbox" name="iplug_transparent" value="' . get_option('iplug_transparent',1) . '"  ' . checked(1, get_option('iplug_transparent',1), true) .'"/>';
 }
 
 function iplug_display_iscircle() {
-	?>
-		<input type="checkbox" name="iplug_iscircle" value="1" <?php checked(1, get_option('iplug_iscircle',1), true);?> />
-	<?php
+	echo '<input type="checkbox" name="iplug_iscircle" value="'. get_option('iplug_iscircle',1) .'" '. checked(1, get_option('iplug_iscircle',1), true) .'"/>';
 }
 
 function iplug_display_addon_panel_fields() {
 	add_settings_section("iplug-zoom-image", "تنظیمات بزرگنمایی تصویر", null, "iplug-zoom");
+
 	add_settings_field("iplug_zoom_level", "Set Zoom Level", "iplug_display_zoom_level", "iplug-zoom", "iplug-zoom-image");
 	add_settings_field("iplug_zoom_size", "Set Zoom Width", "iplug_display_zoom_size", "iplug-zoom", "iplug-zoom-image");
 	add_settings_field("iplug_transparent", "Transparent", "iplug_display_transparent", "iplug-zoom", "iplug-zoom-image");
