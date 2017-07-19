@@ -38,8 +38,12 @@ add_action('wp_footer', "iplug_zoom_product_image");
 add_action('wp_enqueue_scripts', 'iplug_remove_woo_lightbox', 99);
 function iplug_remove_woo_lightbox() {
 	wp_dequeue_style('woocommerce_prettyPhoto_css');
-	wp_dequeue_script('prettyPhoto');
-	wp_dequeue_script('prettyPhoto-init');
+	// wp_dequeue_script('prettyPhoto');
+	// wp_dequeue_script('prettyPhoto-init');
+	// wp_dequeue_script('flexslider');
+	// wp_dequeue_script('photoswipe');
+	// wp_dequeue_script('photoswipe-ui-default');
+	wp_dequeue_script('zoom');
 }
 
 
