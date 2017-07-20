@@ -21,8 +21,8 @@ function iplug_zoom_product_image() {
 
 	// get plugin options
 
-	$iscircle    = get_option('iplug_iscircle',1);
-	$transparent = get_option('iplug_transparent',0);
+	$iscircle    = get_option('iplug_iscircle',1) ? 1 : 0;
+	$transparent = get_option('iplug_transparent',0) ? 1 : 0;
 	$zoom_level  = get_option('iplug_zoom_level',1.2);
 	$zoom_size   = get_option('iplug_zoom_size',300);
 	?>
@@ -79,11 +79,11 @@ function iplug_display_zoom_size() {
 }
 
 function iplug_display_transparent() {
-	echo '<input type="checkbox" name="iplug_transparent" value="' . get_option('iplug_transparent',1) . '"  ' . checked(1, get_option('iplug_transparent',1), true) .'"/>';
+	echo '<input type="checkbox" name="iplug_transparent" value="' . get_option('iplug_transparent',1) . '"  ' . checked(1, get_option('iplug_transparent',1), false) .'/>';
 }
 
 function iplug_display_iscircle() {
-	echo '<input type="checkbox" name="iplug_iscircle" value="'. get_option('iplug_iscircle',1) .'" '. checked(1, get_option('iplug_iscircle',1), true) .'"/>';
+	echo '<input type="checkbox" name="iplug_iscircle" value="'. get_option('iplug_iscircle',1) .'" '. checked(1, get_option('iplug_iscircle',1), false) .'/>';
 }
 
 function iplug_display_addon_panel_fields() {
