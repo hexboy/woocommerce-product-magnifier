@@ -79,11 +79,11 @@ function iplug_display_zoom_size() {
 }
 
 function iplug_display_transparent() {
-	echo '<input type="checkbox" name="iplug_transparent" value="' . get_option('iplug_transparent',1) . '"  ' . checked(1, get_option('iplug_transparent',1), false) .'/>';
+	echo '<input type="checkbox" name="iplug_transparent" value="1"  ' . checked(1, get_option('iplug_transparent',1), false) .'/>';
 }
 
 function iplug_display_iscircle() {
-	echo '<input type="checkbox" name="iplug_iscircle" value="'. get_option('iplug_iscircle',1) .'" '. checked(1, get_option('iplug_iscircle',1), false) .'/>';
+	echo '<input type="checkbox" name="iplug_iscircle" value="1" '. checked(1, get_option('iplug_iscircle',1), false) .'/>';
 }
 
 function iplug_display_addon_panel_fields() {
