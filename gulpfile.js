@@ -1,87 +1,134 @@
 var gulp = require('gulp');
+var del = require('del');
+var sourcemaps = require('gulp-sourcemaps');
+var named = require('vinyl-named');
+var sass = require('gulp-sass');
+var webpack = require('webpack-stream');
+var autoprefixer = require('gulp-autoprefixer');
+var cleanCSS = require('gulp-clean-css');
+
 var destination = 'dist';
 
 gulp.task('clean', function() {
-	var clean = require('gulp-clean');
-	return gulp.src(destination + '/*', { read: false })
-		.pipe(clean({ force: true }));
+	return del(['./dist']);
 });
 
 gulp.task('copy', () =>
 	gulp.src([
 		'src/**/*',
 		'!src/**/*.css',
-		'!src/**/*.scss',
-		// '!src/assets/img/sprity{,/**}',
-		// '!src/assets/css{,/**}',
+		'!src/**/*.js',
+		'!src/**/*.scss'
 	])
-	.pipe(gulp.dest(destination))
+		.pipe(gulp.dest(destination))
 );
 
 // compile css files
 gulp.task('css', function() {
-	var postcss = require('gulp-postcss');
-	var sourcemaps = require('gulp-sourcemaps');
-	var precss = require('precss');
-	var cssnext = require('postcss-cssnext');
-	var customMedia = require("postcss-custom-media");
-	var cssvariables = require('postcss-css-variables');
-
-	return gulp.src([
-			'src/css/Zoom-Product.min.css',
+	return gulp
+		.src([
+			'src/**/*.scss'
 		])
 		.pipe(sourcemaps.init())
-		.pipe(postcss([cssvariables, customMedia, precss, cssnext]))
+		.pipe(sass().on('error', sass.logError))
+		.pipe(
+			autoprefixer({
+				browsers: ['last 5 versions', '> 5%'],
+				cascade: false
+			})
+		)
 		.pipe(sourcemaps.write('.'))
-		.pipe(gulp.dest(destination + '/css/'));
+		.pipe(gulp.dest(destination));
 });
 
 // compress css files
 gulp.task('compresscss', function() {
-	var postcss = require('gulp-postcss');
-	var precss = require('precss');
-	var cssnext = require('postcss-cssnext');
-	var customMedia = require("postcss-custom-media");
-	var cssvariables = require('postcss-css-variables');
-	var cssnano = require('gulp-cssnano');
-
-	return gulp.src([
-			'src/css/Zoom-Product.min.css',
+	return gulp
+		.src([
+			'src/**/*.scss'
 		])
-		.pipe(postcss([cssvariables, customMedia, precss, cssnext]))
-		.pipe(cssnano({ zindex: false }))
-		.pipe(gulp.dest(destination + '/css/'));
+		.pipe(sass().on('error', sass.logError))
+		.pipe(
+			autoprefixer({
+				browsers: ['last 5 versions', '> 5%'],
+				cascade: false
+			})
+		)
+		.pipe(
+			cleanCSS({
+				compatibility: 'ie8'
+			})
+		)
+		.pipe(gulp.dest(destination));
+});
+
+// compile js files
+gulp.task('js', function() {
+	return gulp
+		.src(['src/**/*.js'])
+		.pipe(named())
+		.pipe(
+			webpack({
+				mode: 'development',
+				module: {
+					rules: [{
+						test: /\.js$/,
+						exclude: /(node_modules|bower_components)/,
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: ['@babel/preset-env']
+							}
+						}
+					}]
+				},
+				output: {
+					filename: '[name].js'
+				},
+				externals: {
+					jquery: 'jQuery'
+				},
+				devtool: 'inline-source-map'
+			})
+		)
+		.pipe(gulp.dest(destination + '/js/'));
 });
 
 // compress js files
 gulp.task('compressjs', function() {
-	var minify = require('gulp-minify');
-
-	return gulp.src('src/js/*.js')
-		.pipe(minify({
-			ext: {
-				// src: '-debug.js',
-				min: '.js'
-			},
-			exclude: ['tasks'],
-			ignoreFiles: ['.combo.js', '-minz.js']
-		}))
+	return gulp
+		.src(['src/**/*.js'])
+		.pipe(named())
+		.pipe(
+			webpack({
+				mode: 'production',
+				module: {
+					rules: [{
+						test: /\.js$/,
+						exclude: /(node_modules|bower_components)/,
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: ['@babel/preset-env']
+							}
+						}
+					}]
+				},
+				output: {
+					filename: '[name].js'
+				},
+				externals: {
+					jquery: 'jQuery'
+				},
+				devtool: false
+			})
+		)
 		.pipe(gulp.dest(destination + '/js/'));
 });
 
 
 // make development output
-gulp.task('default', function() {
-	var runSequence = require('run-sequence');
-	runSequence('clean', 'css', 'copy', function() {
-		console.log('Finished');
-	});
-});
+gulp.task('default', gulp.series('clean', 'copy', 'css', 'js'));
 
 // make production output
-gulp.task('build', function() {
-	var runSequence = require('run-sequence');
-	runSequence('clean', 'compresscss', 'compressjs', 'copy', function() {
-		console.log('Finished');
-	});
-});
+gulp.task('build', gulp.series('clean', 'copy', 'compresscss', 'compressjs'));
