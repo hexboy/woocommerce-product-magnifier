@@ -14,26 +14,19 @@ gulp.task('clean', function() {
 });
 
 gulp.task('copy', () =>
-	gulp.src([
-		'src/**/*',
-		'!src/**/*.css',
-		'!src/**/*.js',
-		'!src/**/*.scss'
-	])
+	gulp
+		.src(['src/**/*', '!src/**/*.css', '!src/**/*.js', '!src/**/*.scss'])
 		.pipe(gulp.dest(destination))
 );
 
 // compile css files
 gulp.task('css', function() {
 	return gulp
-		.src([
-			'src/**/*.scss'
-		])
+		.src(['src/**/*.scss'])
 		.pipe(sourcemaps.init())
 		.pipe(sass().on('error', sass.logError))
 		.pipe(
 			autoprefixer({
-				browsers: ['last 5 versions', '> 5%'],
 				cascade: false
 			})
 		)
@@ -44,21 +37,14 @@ gulp.task('css', function() {
 // compress css files
 gulp.task('compresscss', function() {
 	return gulp
-		.src([
-			'src/**/*.scss'
-		])
+		.src(['src/**/*.scss'])
 		.pipe(sass().on('error', sass.logError))
 		.pipe(
 			autoprefixer({
-				browsers: ['last 5 versions', '> 5%'],
 				cascade: false
 			})
 		)
-		.pipe(
-			cleanCSS({
-				compatibility: 'ie8'
-			})
-		)
+		.pipe(cleanCSS())
 		.pipe(gulp.dest(destination));
 });
 
@@ -71,16 +57,18 @@ gulp.task('js', function() {
 			webpack({
 				mode: 'development',
 				module: {
-					rules: [{
-						test: /\.js$/,
-						exclude: /(node_modules|bower_components)/,
-						use: {
-							loader: 'babel-loader',
-							options: {
-								presets: ['@babel/preset-env']
+					rules: [
+						{
+							test: /\.js$/,
+							exclude: /(node_modules|bower_components)/,
+							use: {
+								loader: 'babel-loader',
+								options: {
+									presets: ['@babel/preset-env']
+								}
 							}
 						}
-					}]
+					]
 				},
 				output: {
 					filename: '[name].js'
@@ -103,16 +91,18 @@ gulp.task('compressjs', function() {
 			webpack({
 				mode: 'production',
 				module: {
-					rules: [{
-						test: /\.js$/,
-						exclude: /(node_modules|bower_components)/,
-						use: {
-							loader: 'babel-loader',
-							options: {
-								presets: ['@babel/preset-env']
+					rules: [
+						{
+							test: /\.js$/,
+							exclude: /(node_modules|bower_components)/,
+							use: {
+								loader: 'babel-loader',
+								options: {
+									presets: ['@babel/preset-env']
+								}
 							}
 						}
-					}]
+					]
 				},
 				output: {
 					filename: '[name].js'
@@ -126,9 +116,23 @@ gulp.task('compressjs', function() {
 		.pipe(gulp.dest(destination + '/js/'));
 });
 
-
 // make development output
 gulp.task('default', gulp.series('clean', 'copy', 'css', 'js'));
 
+gulp.task(
+	'watch',
+	gulp.parallel(
+		'default',
+		function jsWatch() {
+			return gulp.watch(['src/**/*.js']).on('change', gulp.series('js'));
+		},
+		function cssWatch() {
+			return gulp
+				.watch(['src/**/*.scss'])
+				.on('change', gulp.series('css'));
+		}
+	)
+);
+
 // make production output
-gulp.task('build', gulp.series('clean', 'copy', 'compresscss', 'compressjs'));
+gulp.task('prod', gulp.series('clean', 'copy', 'compresscss', 'compressjs'));

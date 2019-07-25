@@ -1,51 +1,63 @@
 import $ from 'jquery';
 
 $(document).ready(function() {
-	// console.log('iplug zoom main script is running');
-	var removeZoomZrea = 0;
-	var mousePos = {
+	const imageSelector =
+		'figure.woocommerce-product-gallery__wrapper .woocommerce-product-gallery__image img';
+	let image = null;
+	let timerHandle = null;
+	let mousePos = {
 		X: 0,
 		Y: 0
 	};
-	var largeImage = {
+	let largeImage = {
 		width: 0,
 		height: 0,
 		src: '',
 		ratioW: 1,
 		ratioH: 1
 	};
-	// console.log(ipzo);
 
-	// initail
+	let lastImageSrc = '';
+	let imageTitle = '';
+
+	// initial
 	$('<div id="image-zoom-area"></div>').appendTo($('body'));
 	$('#image-zoom-area').hide();
 	if (ipzo.transparency * 1) {
 		$('#image-zoom-area').addClass('transparent');
 	}
-	$('#image-zoom-area').hover(function() {
-		clearTimeout(removeZoomZrea);
-	}, function() {
-		removeZoomZrea = setTimeout(function() {
-			$('#image-zoom-area').hide();
-		}, 200);
-	});
+	if (ipzo.isCircle * 1) {
+		$('#image-zoom-area').addClass('isCircle');
+	}
+	$('#image-zoom-area').hover(
+		function() {
+			clearTimeout(timerHandle);
+		},
+		function() {
+			timerHandle = setTimeout(function() {
+				$('#image-zoom-area').hide();
+			}, 200);
+		}
+	);
 
-	$('figure.woocommerce-product-gallery__wrapper .woocommerce-product-gallery__image').hover(
+	$(imageSelector).hover(
 		// mouse enter
 		function() {
 			if ($(window).width() < 768) {
 				return;
 			}
 
-			var img = $(this).find('img').eq(0);
-			img.attr('data-tmp-title', img.attr('title'));
-			img.attr('title', '');
-			clearTimeout(removeZoomZrea);
+			image = $(this).eq(0);
+			imageTitle = image.attr('title');
+			image.attr('title', '');
+			clearTimeout(timerHandle);
 
-			// check have image src link
-			largeImage.src = img.attr('data-large_image');
-			largeImage.width = img.attr('data-large_image_width') * ipzo.zoomLevel;
-			largeImage.height = img.attr('data-large_image_height') * ipzo.zoomLevel;
+			// check image have src
+			largeImage.src = image.attr('data-large_image');
+			largeImage.width =
+				image.attr('data-large_image_width') * ipzo.zoomLevel;
+			largeImage.height =
+				image.attr('data-large_image_height') * ipzo.zoomLevel;
 
 			if (largeImage.width > ipzo.maxWidth) {
 				largeImage.width = ipzo.maxWidth;
@@ -54,62 +66,65 @@ $(document).ready(function() {
 				largeImage.height = ipzo.maxHeight;
 			}
 
-			largeImage.ratioW = largeImage.width / img.width();
-			largeImage.ratioH = largeImage.height / img.height();
+			largeImage.ratioW = largeImage.width / image.width();
+			largeImage.ratioH = largeImage.height / image.height();
 
-			$('#image-zoom-area').show();
-
-			$('#image-zoom-area').css({
-				width: ipzo.magnifierSize,
-				height: ipzo.magnifierSize,
-				borderRadius: (ipzo.isCircle * 1) ? '50%' : 0,
-				backgroundImage: 'url(' + largeImage.src + '),url(' + ipzo.bg + ')',
-				backgroundSize: largeImage.width + 'px ' + largeImage.height + 'px' + ',155px 155px',
-				backgroundRepeat: 'no-repeat, repeat'
-			});
-
+			if (lastImageSrc != largeImage.src) {
+				lastImageSrc = largeImage.src;
+				let img = `<img src="${
+					largeImage.src
+				}" onload="this.parentNode.classList.remove('loading')" style="width:${
+					largeImage.width
+				}px;height:${largeImage.height}px;"/>`;
+				$('#image-zoom-area')
+					.show()
+					.html(img)
+					.css({
+						width: ipzo.magnifierSize,
+						height: ipzo.magnifierSize
+					})
+					.addClass('loading');
+			} else {
+				$('#image-zoom-area').show();
+			}
 		},
 		// mouse out
 		function() {
-			var img = $(this).find('img').eq(0);
-			img.attr('title', img.attr('data-tmp-title'));
-			removeZoomZrea = setTimeout(function() {
+			image.attr('title', imageTitle);
+			timerHandle = setTimeout(function() {
 				$('#image-zoom-area').hide();
 			}, 200);
+		}
+	);
 
-		});
-
-	$('figure.woocommerce-product-gallery__wrapper .woocommerce-product-gallery__image').mousemove(function(e) {
+	$(imageSelector).mousemove(function(e) {
 		if ($(window).width() < 768) {
 			return;
 		}
 
 		// set magnifier position
-		// method 1
-		var imageOffset = $(this).find('img').offset();
-		// mousePos.X = Math.round(e.pageX - imageOffset.left);
-		// mousePos.Y = Math.round(e.pageY - imageOffset.top);
-
-		// method 2
+		var imageOffset = $(this).offset();
 		mousePos.X = Math.round(e.pageX - $(document).scrollLeft() + 10);
 		mousePos.Y = Math.round(e.pageY - $(document).scrollTop() + 10);
+
+		// set magnifier background position
+		var backgroundX =
+			-1 * (e.pageX - imageOffset.left) * largeImage.ratioW +
+			ipzo.magnifierSize / 2;
+		var backgroundY =
+			-1 * (e.pageY - imageOffset.top) * largeImage.ratioH +
+			ipzo.magnifierSize / 2;
+		backgroundX = Math.round(backgroundX);
+		backgroundY = Math.round(backgroundY);
+
+		$('#image-zoom-area img').css({
+			top: backgroundY,
+			left: backgroundX
+		});
 
 		$('#image-zoom-area').css({
 			top: mousePos.Y,
 			left: mousePos.X
 		});
-
-		// set magnifier background position
-		var backgroundX = -1 * (e.pageX - imageOffset.left) * largeImage.ratioW + ipzo.magnifierSize / 2;
-		var backgroundY = -1 * (e.pageY - imageOffset.top) * largeImage.ratioH + ipzo.magnifierSize / 2;
-		backgroundX = Math.round(backgroundX);
-		backgroundY = Math.round(backgroundY);
-		$('#image-zoom-area').css({
-			backgroundPosition: backgroundX + 'px ' + backgroundY + 'px'
-		});
-		// console.log(largeImage);
-		// console.log(backgroundX, backgroundY);
-
 	});
-
 });

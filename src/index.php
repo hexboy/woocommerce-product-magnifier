@@ -5,7 +5,7 @@
  *  Plugin URI: https://github.com/hexboy/woocommerce-product-magnifier
  *  Description: simple wordpress plugin, zoom image of product
  *  Author: Hexboy
- *  Version: 1.0.
+ *  Version: 2.0.
  *  Author URI: https://github.com/hexboy/
  */
 
@@ -43,8 +43,7 @@ function ipzo_frontend_assets()
         'zoomLevel' => ipzo_get_option('_zoom_level', 1.2),
         'magnifierSize' => ipzo_get_option('_magnifier_size', 300),
         'maxWidth' => ipzo_get_option('_max_width', 1),
-        'maxHeight' => ipzo_get_option('_max_height', 1),
-        'bg' => plugins_url('/images/bg.jpg', __FILE__)
+        'maxHeight' => ipzo_get_option('_max_height', 1)
     ];
 
     wp_localize_script('jquery', 'ipzo', $ipzo);
